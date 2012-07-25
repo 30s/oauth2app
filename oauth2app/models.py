@@ -82,7 +82,7 @@ class Client(models.Model):
         unique=True,
         max_length=CLIENT_SECRET_LENGTH,
         default=KeyGenerator(CLIENT_SECRET_LENGTH))
-    redirect_uri = models.URLField(null=True)
+    redirect_uri = models.URLField(blank=True)
 
 
 class AccessRange(models.Model):
@@ -187,6 +187,11 @@ class Code(models.Model):
         default=TimestampGenerator(CODE_EXPIRATION))
     redirect_uri = models.URLField(null=True)
     scope = models.ManyToManyField(AccessRange)
+
+
+class Code_Scope(models.Model):
+    code = models.ForeignKey(Code)
+    accessrange = models.ForeignKey(AccessRange)
 
 
 class MACNonce(models.Model):

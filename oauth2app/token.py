@@ -3,7 +3,6 @@
 
 """OAuth 2.0 Token Generation"""
 
-
 from base64 import b64encode
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
@@ -14,7 +13,7 @@ from .consts import ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_LENGTH
 from .consts import AUTHENTICATION_METHOD, MAC, BEARER, MAC_KEY_LENGTH
 from .consts import REFRESHABLE
 from .lib.uri import normalize
-from .models import Client, AccessRange, Code, AccessToken, TimestampGenerator
+from .models import Client, AccessRange, Code, AccessToken, TimestampGenerator, Code_Scope
 from .models import KeyGenerator
 
 
@@ -237,7 +236,9 @@ class TokenGenerator(object):
         now = TimestampGenerator()()
         if self.code.expire < now:
             raise InvalidGrant("Provided code is expired")
-        self.scope = set([x.key for x in self.code.scope.all()])
+        self.scope = set([x.accessrange.key \
+                              for x in Code_Scope.objects.filter(code=self.code)])
+        # self.scope = set([x.key for x in self.code.scope.all()])
         if self.redirect_uri is None:
             raise InvalidRequest('No redirect_uri')
         if normalize(self.redirect_uri) != normalize(self.code.redirect_uri):
