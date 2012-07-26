@@ -3,6 +3,7 @@
 
 """OAuth 2.0 Token Generation"""
 
+
 from base64 import b64encode
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
@@ -13,7 +14,7 @@ from .consts import ACCESS_TOKEN_EXPIRATION, REFRESH_TOKEN_LENGTH
 from .consts import AUTHENTICATION_METHOD, MAC, BEARER, MAC_KEY_LENGTH
 from .consts import REFRESHABLE
 from .lib.uri import normalize
-from .models import Client, AccessRange, Code, AccessToken, TimestampGenerator, Code_Scope
+from .models import Client, AccessRange, Code, AccessToken, TimestampGenerator, Code_Scope, AccessToken_Scope
 from .models import KeyGenerator
 
 
@@ -298,7 +299,10 @@ class TokenGenerator(object):
         if not self.access_token.refreshable:
             raise InvalidGrant("Access token is not refreshable.")
         if self.scope is not None:
-            access_ranges = set([x.key for x in self.access_token.scope.all()])
+            access_ranges = set(
+                [x.accessrange.key \
+                     for x in AccessToken_Scope.objects.filter(
+                            accesstoken=self.access_token)])
             new_scope = self.scope - access_ranges
             if len(new_scope) > 0:
                 raise InvalidScope("Refresh request requested scopes beyond"
