@@ -154,6 +154,11 @@ class AccessToken(models.Model):
     refreshable = models.BooleanField(default=REFRESHABLE)
 
 
+class AccessToken_Scope(models.Model):
+    accesstoken = models.ForeignKey(AccessToken)
+    accessrange = models.ForeignKey(AccessRange)
+
+
 class Code(models.Model):
     """Stores authorization code data.
 

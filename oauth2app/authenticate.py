@@ -10,7 +10,7 @@ from simplejson import dumps
 from django.conf import settings
 from django.http import HttpResponse
 from .exceptions import OAuth2Exception
-from .models import AccessToken, AccessRange, TimestampGenerator
+from .models import AccessToken, AccessRange, TimestampGenerator, AccessToken_Scope
 from .consts import REALM, AUTHENTICATION_METHOD, MAC, BEARER
 
 class AuthenticationException(OAuth2Exception):
@@ -123,7 +123,11 @@ class Authenticator(object):
             raise InvalidRequest("Request authentication failed, no "
                 "authentication credentials provided.")
         if self.authorized_scope is not None:
-            token_scope = set([x.key for x in self.access_token.scope.all()])
+            # token_scope = set([x.key for x in self.access_token.scope.all()])
+            token_scope = set(
+                [x.accessrange.key \
+                     for x in AccessToken_Scope.objects.filter(
+                            accesstoken=self.access_token)])
             new_scope = self.authorized_scope - token_scope
             if len(new_scope) > 0:
                 raise InsufficientScope(("Access token has insufficient "
