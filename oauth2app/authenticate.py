@@ -132,9 +132,9 @@ class Authenticator(object):
             if len(new_scope) > 0:
                 raise InsufficientScope(("Access token has insufficient "
                     "scope: %s") % ','.join(self.authorized_scope))
-        now = TimestampGenerator()()
-        if self.access_token.expire < now:
-            raise InvalidToken("Token is expired")
+        # now = TimestampGenerator()()
+        # if self.access_token.expire < now:
+        #     raise InvalidToken("Token is expired")
 
     def _validate_bearer(self, token):
         """Validate Bearer token."""
